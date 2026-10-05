@@ -4,6 +4,7 @@ import com.example.util.SlideHolder;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -34,9 +35,13 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
 
     @Override
     public void rivals$setSliding(boolean sliding) {
+        boolean prev = this.rivals_isSliding;
         this.rivals_isSliding = sliding;
         if (!sliding) {
             this.rivals_slideTicks = 0;
+        }
+        if (prev != sliding) {
+            this.refreshDimensions();
         }
     }
 
@@ -65,6 +70,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
         return this.canEnterPose(Pose.STANDING);
     }
 
+    @Inject(method = "getDimensions", at = @At("HEAD"), cancellable = true)
+    public void rivals$onGetDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
+        if (this.rivals_isSliding) {
+            // Hitbox height doubled (0.6 -> 1.2) for PvP/combat fairness so head & upper body can be hit
+            cir.setReturnValue(EntityDimensions.scalable(0.6F, 1.2F));
+        }
+    }
+
     @Inject(method = "getStandingEyeHeight", at = @At("HEAD"), cancellable = true)
     protected void rivals$onGetStandingEyeHeight(Pose pose, EntityDimensions dimensions, CallbackInfoReturnable<Float> cir) {
         if (this.rivals_isSliding) {
@@ -80,6 +93,22 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
         }
     }
 
+    @Inject(method = "maybeBackOffFromEdge", at = @At("HEAD"), cancellable = true)
+    protected void rivals$onMaybeBackOffFromEdge(Vec3 movement, MoverType moverType, CallbackInfoReturnable<Vec3> cir) {
+        if (this.rivals_isSliding) {
+            // Disable vanilla sneak edge-protection: allow sliding smoothly over 1-block holes and off cliffs
+            cir.setReturnValue(movement);
+        }
+    }
+
+    @Inject(method = "isStayingOnGroundSurface", at = @At("HEAD"), cancellable = true)
+    protected void rivals$onIsStayingOnGroundSurface(CallbackInfoReturnable<Boolean> cir) {
+        if (this.rivals_isSliding) {
+            // Do not treat slide as edge-holding sneak
+            cir.setReturnValue(false);
+        }
+    }
+
     @Inject(method = "travel", at = @At("HEAD"))
     private void rivals$onTravelHead(Vec3 travelVector, CallbackInfo ci) {
         if (this.rivals_isSliding) {
@@ -89,23 +118,27 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
 
     @Inject(method = "travel", at = @At("TAIL"))
     private void rivals$onTravelTail(Vec3 travelVector, CallbackInfo ci) {
-        if (this.rivals_isSliding && this.onGround()) {
+        if (this.rivals_isSliding) {
             if (this.horizontalCollision) {
                 if (this.canEnterPose(Pose.STANDING)) {
                     this.rivals_isSliding = false;
                     this.rivals_slideCooldown = 8;
+                    this.refreshDimensions();
                 }
                 return;
             }
 
+            // Smooth sliding decay (decay curve starting at 0.975 and gradually settling)
             double progress = Math.min(1.0, (double) this.rivals_slideTicks / 30.0);
             double decay = 0.975 - (0.02 * progress);
             Vec3 current = this.getDeltaMovement();
 
+            // Downhill gravity boost: sliding down slopes preserves or boosts momentum
             if (current.y < -0.05) {
                 decay = Math.min(decay + 0.018, 0.992);
             }
 
+            // Preserve horizontal sliding momentum whether on ground or crossing a small gap/falling
             this.setDeltaMovement(this.rivals_preTravelVel.x * decay, current.y, this.rivals_preTravelVel.z * decay);
         }
     }
@@ -131,6 +164,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
 
             this.rivals_isSliding = false;
             this.rivals_slideCooldown = 6;
+            this.refreshDimensions();
             ci.cancel();
         }
     }
@@ -149,12 +183,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
 
             boolean timeout = this.rivals_slideTicks > 30;
             boolean tooSlow = speed < 0.10 && this.rivals_slideTicks > 5;
-            boolean leftGround = !this.onGround() && this.fallDistance > 0.6F;
+            // Only stop if fallen far (greater than 1.8 blocks), allowing smooth glide over 1-block holes
+            boolean fellFar = !this.onGround() && this.fallDistance > 1.8F;
 
-            if (timeout || tooSlow || leftGround) {
+            if (timeout || tooSlow || fellFar) {
                 if (this.canEnterPose(Pose.STANDING)) {
                     this.rivals_isSliding = false;
                     this.rivals_slideCooldown = 8;
+                    this.refreshDimensions();
                 }
             }
         }

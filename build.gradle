@@ -15,7 +15,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"rivals_slide" {
+		"sliding-mod" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

@@ -7,12 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExampleMod implements ModInitializer {
-	public static final String MOD_ID = "modid";
+	public static final String MOD_ID = "sliding-mod";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Rivals Slide Mod initialized!");
+		LOGGER.info("sliding-mod initialized!");
 		SlideNetworking.initServer();
 	}
 

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "sliding-mod",
   "version": "${version}",
-  "name": "Rivals Slide Mod",
+  "name": "sliding-mod",
   "description": "Roblox RIVALS style sliding and jump boost mod with natural 1st and 3rd person motions",
   "authors": [
     "Me!"
@@ -12,7 +12,7 @@
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/sliding-mod/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -23,9 +23,9 @@
     ]
   },
   "mixins": [
-    "modid.mixins.json",
+    "sliding-mod.mixins.json",
     {
-      "config": "modid.client.mixins.json",
+      "config": "sliding-mod.client.mixins.json",
       "environment": "client"
     }
   ],
