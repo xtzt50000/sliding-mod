@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractClientPlayer.class)
 public abstract class AbstractClientPlayerMixin {
     @Inject(method = "getFieldOfViewModifier", at = @At("RETURN"), cancellable = true)
-    private void rivals$onGetFieldOfViewModifier(CallbackInfoReturnable<Float> cir) {
+    private void slide$onGetFieldOfViewModifier(CallbackInfoReturnable<Float> cir) {
         AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
-        if (player instanceof SlideHolder holder && holder.rivals$isSliding()) {
+        if (player instanceof SlideHolder holder && holder.slide$isSliding()) {
             float base = cir.getReturnValueF();
             double speed = player.getDeltaMovement().horizontalDistance();
             float factor = (float) Math.min(1.0, speed / 0.5);

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
     @Inject(method = "bobHurt", at = @At("TAIL"))
-    private void rivals$onBobHurt(PoseStack poseStack, float tickDelta, CallbackInfo ci) {
+    private void slide$onBobHurt(PoseStack poseStack, float tickDelta, CallbackInfo ci) {
         SlideClientController.applyCameraTilt(poseStack, tickDelta);
     }
 }

@@ -18,9 +18,9 @@ public class SlideClientNetworking {
                 if (client.level != null) {
                     Entity entity = client.level.getEntity(entityId);
                     if (entity instanceof SlideHolder holder) {
-                        holder.rivals$setSliding(sliding);
+                        holder.slide$setSliding(sliding);
                         if (!sliding) {
-                            holder.rivals$setSlideTicks(0);
+                            holder.slide$setSlideTicks(0);
                         }
                     }
                 }

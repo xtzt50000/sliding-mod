@@ -30,7 +30,7 @@ public class SlideClientController {
 
         if (!(player instanceof SlideHolder holder)) return;
 
-        boolean isSliding = holder.rivals$isSliding();
+        boolean isSliding = holder.slide$isSliding();
 
         if (isSliding) {
             // Target camera tilt: -3.5 degrees roll for an action lean into the slide
@@ -42,9 +42,9 @@ public class SlideClientController {
 
             // Release sneak to end slide early if headroom permits
             boolean sneakHeld = player.input.shiftKeyDown;
-            if (!sneakHeld && holder.rivals$canStand()) {
-                holder.rivals$setSliding(false);
-                holder.rivals$setSlideCooldown(8);
+            if (!sneakHeld && holder.slide$canStand()) {
+                holder.slide$setSliding(false);
+                holder.slide$setSlideCooldown(8);
                 SlideClientNetworking.sendSlidePacket(false);
             }
 
@@ -60,7 +60,7 @@ public class SlideClientController {
             if (Math.abs(currentPitch) < 0.01F) currentPitch = 0.0F;
 
             // Trigger slide: Sprinting + Crouch + OnGround + Cooldown ready
-            if (player.isSprinting() && player.input.shiftKeyDown && player.onGround() && holder.rivals$getSlideCooldown() <= 0) {
+            if (player.isSprinting() && player.input.shiftKeyDown && player.onGround() && holder.slide$getSlideCooldown() <= 0) {
                 Vec3 vel = player.getDeltaMovement();
                 double speed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
                 if (speed > 0.08) {
@@ -71,8 +71,8 @@ public class SlideClientController {
     }
 
     private static void startSlide(LocalPlayer player, SlideHolder holder) {
-        holder.rivals$setSliding(true);
-        holder.rivals$setSlideTicks(0);
+        holder.slide$setSliding(true);
+        holder.slide$setSlideTicks(0);
 
         Vec3 look = player.getLookAngle();
         Vec3 lookHoriz = new Vec3(look.x, 0, look.z);

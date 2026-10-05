@@ -18,8 +18,8 @@ public abstract class PlayerModelMixin<T extends LivingEntity> extends HumanoidM
     }
 
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
-    private void rivals$onSetupAnim(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
-        if (entity instanceof SlideHolder holder && holder.rivals$isSliding()) {
+    private void slide$onSetupAnim(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
+        if (entity instanceof SlideHolder holder && holder.slide$isSliding()) {
             PlayerModel<?> pm = (PlayerModel<?>) (Object) this;
 
             // Lower entire body closer to ground for an action knee-slide
@@ -43,7 +43,7 @@ public abstract class PlayerModelMixin<T extends LivingEntity> extends HumanoidM
             this.head.zRot = 0.0F;
             this.hat.copyFrom(this.head);
 
-            // Right leg kicked forward along ground (baseball/action slide)
+            // Right leg kicked forward along ground (action slide)
             this.rightLeg.xRot = (float) Math.toRadians(-75.0);
             this.rightLeg.yRot = (float) Math.toRadians(8.0);
             this.rightLeg.zRot = (float) Math.toRadians(5.0);

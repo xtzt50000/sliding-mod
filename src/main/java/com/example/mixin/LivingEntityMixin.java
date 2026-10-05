@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
     @Inject(method = "getSwimAmount", at = @At("HEAD"), cancellable = true)
-    private void rivals$onGetSwimAmount(float partialTicks, CallbackInfoReturnable<Float> cir) {
-        if (this instanceof SlideHolder holder && holder.rivals$isSliding()) {
+    private void slide$onGetSwimAmount(float partialTicks, CallbackInfoReturnable<Float> cir) {
+        if (this instanceof SlideHolder holder && holder.slide$isSliding()) {
             cir.setReturnValue(0.0F);
         }
     }

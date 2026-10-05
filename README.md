@@ -1,6 +1,6 @@
 # sliding-mod (Minecraft Fabric 1.20.1)
 
-A Roblox RIVALS & movement-shooter style sliding and slide-jump mod for Minecraft Fabric 1.20.1.
+A smooth, fast-paced sliding and slide-jump mod for Minecraft Fabric 1.20.1.
 
 Featuring authentic 3rd-person knee-slide animations, immersive 1st-person camera roll and dynamic FOV, smooth physics deceleration curves, and multiplayer synchronization.
 
@@ -15,7 +15,7 @@ Featuring authentic 3rd-person knee-slide animations, immersive 1st-person camer
 - **Slide Jump Boost**:
   - Pressing Jump (`Space`) during a slide converts horizontal momentum into a powerful forward slide-jump (`+15%` velocity boost).
 - **Authentic 3rd-Person Motion**:
-  - Replaces awkward crawling/swimming animations with a tactical baseball knee-slide pose.
+  - Replaces awkward crawling/swimming animations with a tactical knee-slide pose.
   - Upper body leaned back ~18°, front leg extended forward along the ground, rear knee bent underneath, and arms posed for balance or aiming held weapons.
   - Outer skin layers (jacket, pants, sleeves) fully synchronized.
 - **Immersive 1st-Person Camera Effects**:
@@ -48,7 +48,7 @@ Featuring authentic 3rd-person knee-slide animations, immersive 1st-person camer
   - Bypassed vanilla sneaking ledge-hold (`maybeBackOffFromEdge` & `isStayingOnGroundSurface`) during sliding.
   - Players now smoothly glide across 1-block floor gaps and holes without getting snagged on the edge.
   - Natural gravity is maintained when sliding off edges or cliffs.
-- Renamed project and mod id to `sliding-mod`.
+- Renamed project to `sliding-mod`.
 
 ### `v1.0.0`
 - Initial release featuring smooth sliding physics, tactical knee-slide model pose, 1st-person camera tilt & dynamic FOV, slide jump boost, and multiplayer sync.

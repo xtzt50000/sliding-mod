@@ -18,9 +18,9 @@ public class SlideNetworking {
             boolean sliding = buf.readBoolean();
             server.execute(() -> {
                 if (player instanceof SlideHolder holder) {
-                    holder.rivals$setSliding(sliding);
+                    holder.slide$setSliding(sliding);
                     if (!sliding) {
-                        holder.rivals$setSlideTicks(0);
+                        holder.slide$setSlideTicks(0);
                     }
                 }
 

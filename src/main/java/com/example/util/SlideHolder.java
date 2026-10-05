@@ -1,11 +1,11 @@
 package com.example.util;
 
 public interface SlideHolder {
-    boolean rivals$isSliding();
-    void rivals$setSliding(boolean sliding);
-    int rivals$getSlideTicks();
-    void rivals$setSlideTicks(int ticks);
-    int rivals$getSlideCooldown();
-    void rivals$setSlideCooldown(int cooldown);
-    boolean rivals$canStand();
+    boolean slide$isSliding();
+    void slide$setSliding(boolean sliding);
+    int slide$getSlideTicks();
+    void slide$setSlideTicks(int ticks);
+    int slide$getSlideCooldown();
+    void slide$setSlideCooldown(int cooldown);
+    boolean slide$canStand();
 }

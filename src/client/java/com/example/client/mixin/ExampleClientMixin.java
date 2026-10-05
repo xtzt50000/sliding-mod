@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public class ExampleClientMixin {
 	@Inject(at = @At("TAIL"), method = "tick")
-	private void rivals$onClientTick(CallbackInfo ci) {
+	private void slide$onClientTick(CallbackInfo ci) {
 		SlideClientController.clientTick((Minecraft) (Object) this);
 	}
 }
