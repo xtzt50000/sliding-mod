@@ -109,6 +109,58 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
         }
     }
 
+    @Override
+    public void lerpMotion(double x, double y, double z) {
+        if (this.slide_isSliding) {
+            Vec3 currentVel = this.getDeltaMovement();
+            double incomingHorizSqr = x * x + z * z;
+            if (incomingHorizSqr < 1.0E-4) {
+                // Non-knockback damage (fire, fall, cactus, poison, etc.):
+                // Server sends (0, y, 0) because ServerPlayer deltaMovement is 0 on server.
+                // Preserve the client's current horizontal sliding velocity so slide is not canceled.
+                Vec3 preserved = new Vec3(currentVel.x, currentVel.y, currentVel.z);
+                this.setDeltaMovement(preserved);
+                this.slide_preTravelVel = preserved;
+            } else {
+                // Knockback while sliding: keep sliding active and blend slide momentum with knockback
+                double newX = currentVel.x * 0.55 + x;
+                double newZ = currentVel.z * 0.55 + z;
+                double combinedHorizSqr = newX * newX + newZ * newZ;
+                if (combinedHorizSqr < incomingHorizSqr) {
+                    if (combinedHorizSqr < 1.0E-4) {
+                        newX = x;
+                        newZ = z;
+                    } else {
+                        double scale = Math.sqrt(incomingHorizSqr / combinedHorizSqr);
+                        newX *= scale;
+                        newZ *= scale;
+                    }
+                }
+                double newY = Math.max(currentVel.y, Math.min(y, 0.42));
+                Vec3 knockbackSlideVel = new Vec3(newX, newY, newZ);
+                this.setDeltaMovement(knockbackSlideVel);
+                this.slide_preTravelVel = knockbackSlideVel;
+                if (this.slide_slideTicks > 18) {
+                    this.slide_slideTicks = 18;
+                }
+            }
+            return;
+        }
+        super.lerpMotion(x, y, z);
+    }
+
+    @Override
+    public void knockback(double strength, double x, double z) {
+        Vec3 before = this.getDeltaMovement();
+        super.knockback(strength, x, z);
+        if (this.slide_isSliding) {
+            Vec3 after = this.getDeltaMovement();
+            Vec3 blended = new Vec3(before.x * 0.35 + after.x, after.y, before.z * 0.35 + after.z);
+            this.setDeltaMovement(blended);
+            this.slide_preTravelVel = blended;
+        }
+    }
+
     @Inject(method = "travel", at = @At("HEAD"))
     private void slide$onTravelHead(Vec3 travelVector, CallbackInfo ci) {
         if (this.slide_isSliding) {
@@ -119,15 +171,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
     @Inject(method = "travel", at = @At("TAIL"))
     private void slide$onTravelTail(Vec3 travelVector, CallbackInfo ci) {
         if (this.slide_isSliding) {
-            if (this.horizontalCollision) {
-                if (this.canEnterPose(Pose.STANDING)) {
-                    this.slide_isSliding = false;
-                    this.slide_slideCooldown = 8;
-                    this.refreshDimensions();
-                }
-                return;
-            }
-
             // Smooth sliding decay (decay curve starting at 0.975 and gradually settling)
             double progress = Math.min(1.0, (double) this.slide_slideTicks / 30.0);
             double decay = 0.975 - (0.02 * progress);
@@ -138,8 +181,10 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
                 decay = Math.min(decay + 0.018, 0.992);
             }
 
-            // Preserve horizontal sliding momentum whether on ground or crossing a small gap/falling
-            this.setDeltaMovement(this.slide_preTravelVel.x * decay, current.y, this.slide_preTravelVel.z * decay);
+            // Preserve horizontal sliding momentum on unobstructed axes
+            double nextX = (this.horizontalCollision && Math.abs(current.x) < 1.0E-4) ? 0.0 : this.slide_preTravelVel.x * decay;
+            double nextZ = (this.horizontalCollision && Math.abs(current.z) < 1.0E-4) ? 0.0 : this.slide_preTravelVel.z * decay;
+            this.setDeltaMovement(nextX, current.y, nextZ);
         }
     }
 
@@ -178,16 +223,26 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlideHol
         if (this.slide_isSliding) {
             this.slide_slideTicks++;
 
-            Vec3 vel = this.getDeltaMovement();
-            double speed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
+            if (this.level().isClientSide()) {
+                Vec3 vel = this.getDeltaMovement();
+                double speed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
 
-            boolean timeout = this.slide_slideTicks > 30;
-            boolean tooSlow = speed < 0.10 && this.slide_slideTicks > 5;
-            // Only stop if fallen far (greater than 1.8 blocks), allowing smooth glide over 1-block holes
-            boolean fellFar = !this.onGround() && this.fallDistance > 1.8F;
+                boolean timeout = this.slide_slideTicks > 30;
+                // Do not cancel slide due to low speed while taking damage / knockback (hurtTime > 0)
+                boolean tooSlow = speed < 0.08 && this.slide_slideTicks > 5 && this.hurtTime == 0;
+                // Only stop if fallen far (greater than 1.8 blocks), allowing smooth glide over 1-block holes
+                boolean fellFar = !this.onGround() && this.fallDistance > 1.8F;
 
-            if (timeout || tooSlow || fellFar) {
-                if (this.canEnterPose(Pose.STANDING)) {
+                if (timeout || tooSlow || fellFar) {
+                    if (this.canEnterPose(Pose.STANDING)) {
+                        this.slide_isSliding = false;
+                        this.slide_slideCooldown = 8;
+                        this.refreshDimensions();
+                    }
+                }
+            } else {
+                // Server-side safety fallback timeout; normal slide end is synced via packet from client
+                if (this.slide_slideTicks > 60 && this.canEnterPose(Pose.STANDING)) {
                     this.slide_isSliding = false;
                     this.slide_slideCooldown = 8;
                     this.refreshDimensions();

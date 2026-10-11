@@ -20,13 +20,17 @@ public class SlideClientController {
     private static float prevRoll = 0.0F;
     private static float currentPitch = 0.0F;
     private static float prevPitch = 0.0F;
+    private static boolean wasSliding = false;
 
     public static void clientTick(Minecraft mc) {
         prevRoll = currentRoll;
         prevPitch = currentPitch;
 
         LocalPlayer player = mc.player;
-        if (player == null) return;
+        if (player == null) {
+            wasSliding = false;
+            return;
+        }
 
         if (!(player instanceof SlideHolder holder)) return;
 
@@ -45,11 +49,11 @@ public class SlideClientController {
             if (!sneakHeld && holder.slide$canStand()) {
                 holder.slide$setSliding(false);
                 holder.slide$setSlideCooldown(8);
-                SlideClientNetworking.sendSlidePacket(false);
+                isSliding = false;
             }
 
             // Spawn dust particles while sliding on the ground
-            if (player.onGround() && mc.level != null) {
+            if (isSliding && player.onGround() && mc.level != null) {
                 spawnSlideParticles(mc, player);
             }
         } else {
@@ -65,9 +69,15 @@ public class SlideClientController {
                 double speed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
                 if (speed > 0.08) {
                     startSlide(player, holder);
+                    isSliding = true;
                 }
             }
         }
+
+        if (wasSliding && !isSliding) {
+            SlideClientNetworking.sendSlidePacket(false);
+        }
+        wasSliding = isSliding;
     }
 
     private static void startSlide(LocalPlayer player, SlideHolder holder) {

@@ -11,9 +11,9 @@
 
 | Step / 단계 | English | 한국어 |
 |:---:|---|---|
-| **1. Download<br>다운로드** | Download the latest [sliding-mod-1.1.0.jar](https://github.com/xtzt50000/sliding-mod/releases) from GitHub Releases. | GitHub Releases에서 최신 버전의 [sliding-mod-1.1.0.jar](https://github.com/xtzt50000/sliding-mod/releases) 파일을 다운로드합니다. |
+| **1. Download<br>다운로드** | Download the latest [sliding-mod-1.1.1.jar](https://github.com/xtzt50000/sliding-mod/releases) from GitHub Releases. | GitHub Releases에서 최신 버전의 [sliding-mod-1.1.1.jar](https://github.com/xtzt50000/sliding-mod/releases) 파일을 다운로드합니다. |
 | **2. Requirements<br>필수 준비** | Requires **Minecraft 1.20.1**, [Fabric Loader 1.20.1](https://fabricmc.net/use/installer/) (0.14.21+), and [Fabric API 1.20.1](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/all?page=1&pageSize=20&version=1.20.1). | **마인크래프트 1.20.1**, [Fabric Loader 1.20.1](https://fabricmc.net/use/installer/) (0.14.21 이상), [Fabric API 1.20.1](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/all?page=1&pageSize=20&version=1.20.1)이 필요합니다. |
-| **3. Install<br>모드 넣기** | Press `Win + R`, type `%appdata%\.minecraft`, open the `mods` folder, and place **`sliding-mod-1.1.0.jar`** and **`Fabric API`** inside. | `Win + R` 키를 누르고 `%appdata%\.minecraft` 입력 후 엔터, `mods` 폴더 안에 **`sliding-mod-1.1.0.jar`** 와 **`Fabric API`** 파일을 넣습니다. |
+| **3. Install<br>모드 넣기** | Press `Win + R`, type `%appdata%\.minecraft`, open the `mods` folder, and place **`sliding-mod-1.1.1.jar`** and **`Fabric API`** inside. | `Win + R` 키를 누르고 `%appdata%\.minecraft` 입력 후 엔터, `mods` 폴더 안에 **`sliding-mod-1.1.1.jar`** 와 **`Fabric API`** 파일을 넣습니다. |
 | **4. Launch<br>게임 실행** | Select the **Fabric-Loader-1.20.1** profile in your Minecraft Launcher and start the game! | 마인크래프트 런처에서 **Fabric-Loader-1.20.1** 프로필을 선택하고 게임을 시작합니다! |
 
 ---
@@ -37,6 +37,7 @@
 | **1st-Person Camera<br>1인칭 시점 연출** | Eye height smoothly drops to `0.85F`. Features action camera roll (`-3.5°`) and pitch tilt, dynamic FOV widening (up to `+12%`), block step dust particles, and sliding sound effects. | 시선 높이가 `0.85F`로 부드럽게 낮아지며, 액션 카메라 롤(`-3.5°`) 및 피치 틸트, 속도 비례 다이내믹 FOV(최대 `+12%`), 마찰음 및 바닥 먼지 파티클 연출. |
 | **Combat Hitbox (v1.1.0)<br>전투/PvP 밸런스 히트박스** | Hitbox height doubled (`0.6` ➡️ `1.2`) to cover head and upper body for fair PvP/combat hit detection. Slides through 1.5-block openings (slabs/trapdoors). | 전투 및 PvP 공정성을 위해 히트박스 높이를 2배 상향(`0.6` ➡️ `1.2`)하여 머리와 상체 피격 판정 추가. 1.5블록 틈새(반블록/트랩도어)는 여유 있게 통과. |
 | **Gap Sliding (v1.1.0)<br>1블록 구멍 통과** | Bypasses vanilla sneaking edge-protection (`maybeBackOffFromEdge`). Glides smoothly over 1-block floor gaps and holes without getting snagged. Natural vertical gravity is maintained. | 바닐라 쉬프트 낭떠러지 방지 판정을 해제하여 1칸짜리 바닥 구멍이나 틈새를 만나도 멈추지 않고 스윽 미끄러져 통과. 절벽에서 떨어질 때는 수직 중력이 정상 작동하여 자연스럽게 낙하. |
+| **Damage & Sliding Knockback (v1.1.1)<br>피격 시 슬라이딩 유지 & 슬라이딩 넉백** | Taking damage no longer cancels your slide. Non-knockback damage preserves full sliding speed, while attacks/explosions apply smooth sliding knockback without breaking your slide pose. | 슬라이딩 도중 데미지를 받아도 슬라이딩이 풀리지 않고 유지됩니다. 공격이나 폭발에 밀쳐질 때도 자세가 풀리지 않으며 기존 관성과 결합된 부드러운 슬라이딩 넉백이 적용됩니다. |
 | **Multiplayer Sync<br>완벽한 멀티플레이 동기화** | Custom C2S and S2C network packets synchronize sliding state across all tracking players in real time with zero rubberbanding. | C2S / S2C 네트워크 패킷 통신을 통해 다른 플레이어의 화면에서도 내 슬라이딩 모션이 끊김(러버밴딩) 없이 실시간 동기화. |
 
 ---
@@ -45,7 +46,8 @@
 
 | Version / 버전 | English | 한국어 |
 |:---:|---|---|
-| **`v1.1.0`** *(Latest)* | Combat hitbox height doubled to `1.2`, sneak edge-protection bypassed for 1-block gap sliding, project renamed to `sliding-mod`. | 전투/PvP 히트박스 높이 2배 상향(`1.2`), 1블록 구멍 통과를 위한 낭떠러지 방지 해제, `sliding-mod`로 정식 리팩토링. |
+| **`v1.1.1`** *(Latest)* | Fixed bug where taking damage canceled sliding; added smooth sliding knockback when hit and improved server-client slide end sync. | 슬라이딩 중 데미지를 받을 때 슬라이딩이 취소되던 버그 수정, 피격 시 슬라이딩 넉백 물리 적용 및 서버-클라이언트 종료 동기화 개선. |
+| **`v1.1.0`** | Combat hitbox height doubled to `1.2`, sneak edge-protection bypassed for 1-block gap sliding, project renamed to `sliding-mod`. | 전투/PvP 히트박스 높이 2배 상향(`1.2`), 1블록 구멍 통과를 위한 낭떠러지 방지 해제, `sliding-mod`로 정식 리팩토링. |
 | **`v1.0.0`** | Initial release: Smooth physics, 3rd-person knee-slide animation, 1st-person camera tilt & dynamic FOV, slide-jump boost, multiplayer sync. | 최초 릴리즈: 부드러운 슬라이딩 물리, 3인칭 니슬라이딩 모션, 1인칭 카메라 틸트 및 다이내믹 FOV, 슬라이드 점프, 멀티플레이 동기화. |
 
 ---
@@ -60,7 +62,7 @@
 ./gradlew runClient
 # (Windows: run_game.bat)
 ```
-- Built jar file located at / 빌드 파일 위치: `build/libs/sliding-mod-1.1.0.jar`
+- Built jar file located at / 빌드 파일 위치: `build/libs/sliding-mod-1.1.1.jar`
 
 ---
 
